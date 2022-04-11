@@ -5,18 +5,24 @@ const tab = document.querySelectorAll (".button-group button");
 const search = document.querySelector(".search");
 const crop = document.querySelector("#crop");
 const select = document.querySelector("#js-select");
-const sortAdvance = document.querySelector(".js-sort-Advance");
+const sortAdvanced = document.querySelector(".js-sort-advanced");
 let data = [];
 
 // 取得json資料並賦予在data上
 function getData() {
     axios.get(url)
         .then((response) => {
-            data = response.data;
-            filterData = response.data.filter((value) => value.作物名稱);
+            data = response.data.filter((value) => {
+                return value.作物名稱;
+            });
+            filterData = response.data.filter((value) => {
+                return value.作物名稱
+            });
             renderData(showData);
         });
 };
+
+getData();
 
 // 組字串、資料初始化
 function renderData(showData) {
@@ -96,10 +102,9 @@ function keywordFilter() {
         crop.value = "";
         return
     } else if (crop.value.trim() != "") {
-
         // 比對輸入關鍵字與資料庫有無相符資料
         filterData = data.filter ((value) => {
-            return value.作物名稱.match(crop.value)
+            return value.作物名稱.match(crop.value);
         });
         // 若比對結果沒有任何一筆資料相符，則跳出提示
         if (filterData.length == 0) {
@@ -145,6 +150,26 @@ function selectChange(value) {
     renderData(filterData);
 };
 
-sortAdvance.addEventListener("click", (e) => {
-    console.log("有點擊到");
+// 點擊箭頭進行排序
+sortAdvanced.addEventListener("click", (e) => {
+    // 選取到箭頭符號
+    if (e.target.nodeName === "I") {
+        let sortPrice = "";
+        sortPrice = e.target.dataset.price;
+        let sortCaret = "";
+        sortCaret = e.target.dataset.sort;
+        // 由大至小排序
+        if (sortCaret === "up") {
+            filterData.sort((a, b) => {
+                return b[sortPrice] - a[sortPrice];
+            })
+        } 
+        // 由小至大排序
+        else if (sortCaret === "down") {
+            filterData.sort((a, b) => {
+                return a[sortPrice] - b[sortPrice];
+            })
+        }
+    }
+    renderData(filterData);
 });
